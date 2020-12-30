@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "vanguard.mixins.json"
   ],
 
   "depends": {

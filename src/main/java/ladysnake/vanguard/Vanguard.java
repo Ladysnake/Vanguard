@@ -8,15 +8,20 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class Vanguard implements ModInitializer {
-    static final String MODID = "vanguard";
+    public static final String MODID = "vanguard";
     static final Logger logger = LogManager.getLogger("Vanguard");
 
     static final String UNINSTALLER = "vanguard-uninstaller.jar";
 
+    public static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
+
     @Override
     public void onInitialize() {
+        UPDATED_MODS.add("illuminations");
+
         // delete uninstaller
         if (Files.exists(Paths.get("mods/" + UNINSTALLER))) {
             try {

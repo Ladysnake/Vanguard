@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class VanguardUpdater {
     public static void addCustomUpdater(String modid, String updateUrl, Class mainModClass) {
+        Vanguard.UPDATED_MODS.add(modid);
         Vanguard.logger.info("Vanguard is watching "+modid+" for updates");
 
         // verify it's not a dev environment

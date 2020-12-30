@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "ladysnake.vanguard.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "TitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
