@@ -13,7 +13,7 @@
     "sources": "https://github.com/Ladysnake/Vanguard"
   },
 
-  "license": "GNU GPLv3",
+  "license": "GNU LGPLv3",
   "icon": "assets/vanguard/icon.png",
 
   "environment": "*",
