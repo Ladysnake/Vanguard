@@ -61,8 +61,7 @@ public class VanguardUpdater {
                             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                                 try {
                                     Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, uninstalling " + oldFile);
-                                    ProcessBuilder pb = new ProcessBuilder("java", "-jar", "mods/" + Vanguard.UNINSTALLER, oldFile, latestFileName);
-                                    pb.start();
+                                    new ProcessBuilder("java", "-jar", "mods/" + Vanguard.UNINSTALLER, oldFile, latestFileName).start();
                                 } catch (IOException e) {
                                     Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
                                     e.printStackTrace();
