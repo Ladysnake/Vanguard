@@ -20,8 +20,6 @@ public class Vanguard implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        UPDATED_MODS.add("illuminations");
-
         // delete uninstaller
         if (Files.exists(Paths.get("mods/" + UNINSTALLER))) {
             try {
