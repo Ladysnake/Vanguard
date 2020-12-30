@@ -29,7 +29,7 @@ public class UpdateToast implements Toast {
 
     @Override
     public int getWidth() {
-        return 256;
+        return 233;
     }
 
     @Override
