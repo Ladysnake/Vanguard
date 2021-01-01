@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class VanguardUpdater {
     public static void addCustomUpdater(String modid, String updateUrl, Class mainModClass) {
         Vanguard.UPDATED_MODS.add(modid);
-        Vanguard.logger.info("Vanguard is watching "+modid+" for updates");
+        Vanguard.logger.info("Vanguard is watching " + modid + " for updates");
 
         // verify it's not a dev environment
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
@@ -43,7 +43,7 @@ public class VanguardUpdater {
                     String latestFileName = latestVersionJson.get("filename").getAsString() + ".future";
                     // if not the latest version, update toast
                     if (!latestVersion.equalsIgnoreCase(modVersion)) {
-                        Vanguard.logger.log(Level.INFO, "Currently present version of "+modid+" is " + modVersion + " while the latest version for Minecraft " + minecraftVersion + " is " + latestVersion + "; downloading update");
+                        Vanguard.logger.log(Level.INFO, "Currently present version of " + modid + " is " + modVersion + " while the latest version for Minecraft " + minecraftVersion + " is " + latestVersion + "; downloading update");
 
                         try {
                             // download new jar
@@ -61,7 +61,7 @@ public class VanguardUpdater {
                             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                                 try {
                                     Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, uninstalling " + oldFile);
-                                    new ProcessBuilder("java", "-jar", "mods/" + Vanguard.UNINSTALLER, oldFile, latestFileName).start();
+                                    new ProcessBuilder("java", "-jar", "mods/" + Vanguard.UNINSTALLER, "mods/" + oldFile, "mods/" + latestFileName).start();
                                 } catch (IOException e) {
                                     Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
                                     e.printStackTrace();
