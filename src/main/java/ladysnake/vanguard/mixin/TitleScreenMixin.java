@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class TitleScreenMixin {
     @Inject(at = @At(value = "RETURN"), method = "render")
     protected void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (Vanguard.UPDATED_MODS.size() > 0) {
+        if (Vanguard.getUpdatedMods().size() > 0) {
             UpdateToast.add();
         }
     }

@@ -17,7 +17,7 @@ public class Vanguard implements ModInitializer {
 
     static final String UNINSTALLER = "vanguard-uninstaller.jar";
 
-    public static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
+    static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
 
     @Override
     public void onInitialize() {
@@ -29,5 +29,9 @@ public class Vanguard implements ModInitializer {
                 logger.log(Level.WARN, "Could not remove uninstaller because of I/O Error: " + e.getMessage());
             }
         }
+    }
+
+    public static ArrayList<String> getUpdatedMods() {
+        return UPDATED_MODS;
     }
 }
