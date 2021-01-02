@@ -1,4 +1,4 @@
-package ladysnake.uninstaller;
+package ladysnake.vanguard.uninstaller;
 
 import java.io.File;
 import java.io.IOException;

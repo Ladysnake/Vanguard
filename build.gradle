@@ -71,6 +71,8 @@ configurations {
 	contained {
 		transitive = false
 	}
+
+	implementation.extendsFrom(contained)
 }
 
 dependencies {
