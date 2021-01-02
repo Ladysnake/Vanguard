@@ -1,12 +1,6 @@
 plugins {
     id 'java'
 }
-jar {
-    manifest {
-        attributes(
-            "Main-Class": 'ladysnake.vanguard.uninstaller.Main'
-        )
-    }
-}
+
 
 archivesBaseName = 'vanguard-uninstaller'

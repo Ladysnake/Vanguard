@@ -8,6 +8,8 @@ plugins {
 	id "maven-publish"
 }
 
+//tasks.jar.dependsOn(project(':uninstaller').tasks.build)
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -71,8 +73,6 @@ configurations {
 	contained {
 		transitive = false
 	}
-
-	implementation.extendsFrom(contained)
 }
 
 dependencies {
