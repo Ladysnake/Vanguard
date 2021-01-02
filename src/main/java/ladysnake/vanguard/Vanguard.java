@@ -1,14 +1,23 @@
 package ladysnake.vanguard;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.CustomValue;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.JarURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,26 +28,89 @@ public class Vanguard implements ModInitializer {
 
     static final String UNINSTALLER = "vanguard-uninstaller.jar";
 
+    static final ArrayList<String> UNINSTALLER_PARAMS = new ArrayList<>();
+
     static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
 
     @Override
     public void onInitialize() {
         // delete uninstaller
-        if (Files.exists(Paths.get("mods/" + UNINSTALLER))) {
+        if (Files.exists(Paths.get("mods/"+UNINSTALLER))) {
             try {
-                Files.delete(Paths.get("mods/" + UNINSTALLER));
+                Files.delete(Paths.get("mods/"+UNINSTALLER));
             } catch (IOException e) {
                 logger.log(Level.WARN, "Could not remove uninstaller because of I/O Error: " + e.getMessage());
             }
         }
 
-        // delete all future files
-        Pattern pattern = Pattern.compile("-(\\d+\\.\\d+(\\.\\d)*)");
+        // delete all .future files
+        Pattern pattern = Pattern.compile("\\.future$");
         for (File mod : new File("mods").listFiles()) {
             Matcher matcher = pattern.matcher(mod.getName());
             if (matcher.find()) {
                 mod.delete();
             }
+        }
+
+        // get all mods that must be watched by vanguard
+        FabricLoader loader = FabricLoader.getInstance();
+        for (ModContainer mod : loader.getAllMods()) {
+            String modId = mod.getMetadata().getId();
+            CustomValue vanguardData = mod.getMetadata().getCustomValue("vanguard");
+            if (vanguardData != null) {
+                CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
+                try {
+                    URL rootUrl = mod.getRootPath().toUri().toURL();
+                    URLConnection connection = rootUrl.openConnection();
+                    if (connection instanceof JarURLConnection) {
+                        URI uri = ((JarURLConnection) connection).getJarFileURL().toURI();
+                        if (uri.getScheme().equals("file")) {
+                            String oldFilePath = Paths.get(uri).toString();
+                            String oldFile = Paths.get(oldFilePath).getFileName().toString();
+                            System.out.println(oldFile);
+                            UNINSTALLER_PARAMS.add(oldFile);
+
+                            if (vanguardObj.containsKey("update-url")) {
+                                VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString());
+                            } else if (vanguardObj.containsKey("curse-project-id")) {
+                                VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString());
+                            }
+                        } else {
+                            return; // else abort update
+                        }
+                    } else {
+                        return; // else abort update
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // extract the uninstaller if needed and add a shutdown hook to uninstall old files and install new ones
+        if (UNINSTALLER_PARAMS.size() > 0) {
+            InputStream in = Vanguard.class.getResourceAsStream("/" + Vanguard.UNINSTALLER);
+            try {
+                Files.copy(in, Paths.get("mods/"+UNINSTALLER), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, starting mod uninstaller");
+
+                    StringBuilder commandParams = new StringBuilder();
+                    for (String uninstallerParam : UNINSTALLER_PARAMS) {
+                        commandParams.append(" ").append(uninstallerParam);
+                    }
+
+                    Runtime.getRuntime().exec("java -jar mods/" + Vanguard.UNINSTALLER + commandParams);
+                } catch (IOException e) {
+                    Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
+                    e.printStackTrace();
+                }
+            }));
         }
     }
 
