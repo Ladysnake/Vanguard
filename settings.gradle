@@ -10,3 +10,5 @@ pluginManagement {
 }
 
 rootProject.name = 'vanguard'
+
+include 'uninstaller'

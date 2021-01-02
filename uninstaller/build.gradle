@@ -1,0 +1,8 @@
+plugins {
+    id 'application'
+}
+application {
+    mainClass = 'ladysnake.uninstaller.Main'
+}
+
+archivesBaseName = 'vanguard-uninstaller'

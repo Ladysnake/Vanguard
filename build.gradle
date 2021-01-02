@@ -66,3 +66,19 @@ jar {
 }
 
 apply from: 'release.gradle'
+
+configurations {
+	contained {
+		transitive = false
+	}
+}
+
+dependencies {
+	contained  project(':uninstaller')
+}
+
+jar {
+	from(configurations.contained.files) {
+		include '*'
+	}
+}
