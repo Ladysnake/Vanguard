@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "ladysnake.vanguard.Vanguard"
+    ],
+    "modmenu": [
+      "ladysnake.vanguard.client.VanguardModMenuIntegration"
     ]
   },
   "mixins": [

@@ -8,14 +8,22 @@ plugins {
 	id "maven-publish"
 }
 
-//tasks.jar.dependsOn(project(':uninstaller').tasks.build)
-
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+repositories {
+	jcenter()
+	maven { url 'https://jitpack.io' }
+
+	maven {
+		name = "Cotton"
+		url = "http://server.bbkr.space:8081/artifactory/libs-release/"
+	}
+}
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -26,8 +34,17 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
+	// cloth config
+	modApi("me.shedaniel.cloth:config-2:4.8.2") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	include "me.shedaniel.cloth:config-2:4.8.2"
+
+	// mod menu
+	modImplementation("io.github.prospector:modmenu:1.14.6+build.31") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+
 }
 
 processResources {
@@ -68,19 +85,3 @@ jar {
 }
 
 apply from: 'release.gradle'
-
-configurations {
-	contained {
-		transitive = false
-	}
-}
-
-dependencies {
-	contained  project(':uninstaller')
-}
-
-jar {
-	from(configurations.contained.files) {
-		include '*'
-	}
-}

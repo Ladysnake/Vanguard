@@ -34,6 +34,9 @@ public class Vanguard implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        // load config
+        Config.load();
+
         // delete uninstaller
         if (Files.exists(Paths.get("mods/"+UNINSTALLER))) {
             try {

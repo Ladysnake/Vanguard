@@ -1,4 +1,4 @@
-package ladysnake.client.vanguard;
+package ladysnake.vanguard.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.vanguard.Vanguard;
