@@ -1,0 +1,6 @@
+{
+  "title.vanguard.config": "Vanguard Config",
+  "category.vanguard.general": "General",
+  "option.vanguard.toggle": "Toggle Vanguard Auto-Update",
+  "option.tooltip.vanguard.toggle": "Controls auto-updating for all mods using Vanguard."
+}
