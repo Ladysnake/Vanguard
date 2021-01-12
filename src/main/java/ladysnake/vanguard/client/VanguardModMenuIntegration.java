@@ -3,11 +3,8 @@ package ladysnake.vanguard.client;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import ladysnake.vanguard.Config;
 import ladysnake.vanguard.Vanguard;
-import ladysnake.vanguard.VanguardModScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.text.TranslatableText;
 
 import java.util.function.Function;
 

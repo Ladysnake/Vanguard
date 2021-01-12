@@ -1,7 +1,7 @@
 package ladysnake.vanguard.mixin;
 
-import ladysnake.vanguard.client.UpdateToast;
 import ladysnake.vanguard.Vanguard;
+import ladysnake.vanguard.client.UpdateToast;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import org.spongepowered.asm.mixin.Mixin;

@@ -3,25 +3,19 @@ package ladysnake.vanguard.client;
 import io.github.prospector.modmenu.gui.ModListWidget;
 import ladysnake.vanguard.Config;
 import ladysnake.vanguard.Vanguard;
-import ladysnake.vanguard.VanguardModScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.screen.options.SkinOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.LockButtonWidget;
 import net.minecraft.client.gui.widget.OptionButtonWidget;
 import net.minecraft.client.options.BooleanOption;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.Option;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.Difficulty;
 
 @Environment(EnvType.CLIENT)
 public class VanguardConfigScreen extends Screen {
