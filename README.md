@@ -47,9 +47,9 @@ Naturally, you have to replace `https://illuminations.glitch.me/latest?version=`
 
 ```json
 {
-    version: "YourModVersionNumber",
-    filename: "YourMod.jar",
-    download: "YourModJarDownloadURL"
+    "version": "YourModVersionNumber",
+    "filename": "YourMod.jar",
+    "download": "YourModJarDownloadURL"
 }
 ```
 
