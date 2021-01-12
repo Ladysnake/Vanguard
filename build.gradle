@@ -1,5 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
+	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id "com.jfrog.bintray" version '1.8.4'
 	id 'org.ajoberstar.grgit' version '3.1.1'
@@ -77,66 +78,3 @@ jar {
 }
 
 apply from: 'release.gradle'
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	// select the repositories you want to publish to
-	repositories {
-		// uncomment to publish to the local maven
-		// mavenLocal()
-	}
-}
-
-task checkGitStatus() {
-	group = 'publishing'
-	description = 'Checks that the git repository is in a state suitable for release'
-	doLast {
-		if (grgit == null) throw new RuntimeException('No git repository')
-		if (!grgit.status().isClean()) {
-			throw new RuntimeException("Git repository not ready for release (${grgit.status()})")
-		}
-		def currentBranch = grgit.branch.current().getName()
-		grgit.fetch()
-		if (grgit.tag.list().any { it.name == project.version }) {
-			throw new RuntimeException("A tag already exists for ${project.version}")
-		}
-		def status = grgit.branch.status(name: currentBranch)
-		if (status.aheadCount != 0) {
-			throw new RuntimeException('Some commits have not been pushed')
-		}
-		if (status.behindCount != 0) {
-			throw new RuntimeException('Some commits have not been pulled')
-		}
-	}
-}
-
-githubRelease {
-	repo "Illuminations"
-	token "${getProjectProperty('github_releases_token')}"
-	// default owner: last component of maven group
-	// default repo: name of the project
-	tagName = project.version
-	targetCommitish = { grgit.branch.current().name }
-	body = { project.getChangelogText() }
-
-	FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
-	releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
-}
-tasks.githubRelease.dependsOn(checkGitStatus)
-
-task release(dependsOn: [tasks.githubRelease]) {
-	group = 'publishing'
-	description = 'Releases a new version to Github and Curseforge'
-}
