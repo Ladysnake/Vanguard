@@ -4,12 +4,15 @@ plugins {
 	id "com.jfrog.bintray" version '1.8.4'
 	id 'org.ajoberstar.grgit' version '3.1.1'
 	id 'com.github.breadmoirai.github-release' version '2.2.9'
-	id "com.wynprice.cursemaven" version "2.1.1"
-	id "maven-publish"
+	id 'com.wynprice.cursemaven' version '1.2.3'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+// Adds a few utility methods like getProjectProperty
+apply from: 'https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/utilities.gradle'
+apply from: 'https://raw.githubusercontent.com/NerdHubMC/Gradle-Scripts/master/scripts/fabric/publish/changelog.gradle'
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -18,11 +21,6 @@ group = project.maven_group
 repositories {
 	jcenter()
 	maven { url 'https://jitpack.io' }
-
-	maven {
-		name = "Cotton"
-		url = "http://server.bbkr.space:8081/artifactory/libs-release/"
-	}
 }
 
 dependencies {
@@ -33,12 +31,6 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// cloth config
-	modApi("me.shedaniel.cloth:config-2:4.8.2") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-	include "me.shedaniel.cloth:config-2:4.8.2"
 
 	// mod menu
 	modImplementation("io.github.prospector:modmenu:1.14.6+build.31") {
@@ -85,3 +77,46 @@ jar {
 }
 
 apply from: 'release.gradle'
+
+
+task checkGitStatus() {
+	group = 'publishing'
+	description = 'Checks that the git repository is in a state suitable for release'
+	doLast {
+		if (grgit == null) throw new RuntimeException('No git repository')
+		if (!grgit.status().isClean()) {
+			throw new RuntimeException("Git repository not ready for release (${grgit.status()})")
+		}
+		def currentBranch = grgit.branch.current().getName()
+		grgit.fetch()
+		if (grgit.tag.list().any { it.name == project.version }) {
+			throw new RuntimeException("A tag already exists for ${project.version}")
+		}
+		def status = grgit.branch.status(name: currentBranch)
+		if (status.aheadCount != 0) {
+			throw new RuntimeException('Some commits have not been pushed')
+		}
+		if (status.behindCount != 0) {
+			throw new RuntimeException('Some commits have not been pulled')
+		}
+	}
+}
+
+githubRelease {
+	repo "Illuminations"
+	token "${getProjectProperty('github_releases_token')}"
+	// default owner: last component of maven group
+	// default repo: name of the project
+	tagName = project.version
+	targetCommitish = { grgit.branch.current().name }
+	body = { project.getChangelogText() }
+
+	FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
+	releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
+}
+tasks.githubRelease.dependsOn(checkGitStatus)
+
+task release(dependsOn: [tasks.githubRelease]) {
+	group = 'publishing'
+	description = 'Releases a new version to Github and Curseforge'
+}

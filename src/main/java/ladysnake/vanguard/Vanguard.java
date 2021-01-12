@@ -4,6 +4,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +32,7 @@ public class Vanguard implements ModInitializer {
 
     static final ArrayList<String> UNINSTALLER_PARAMS = new ArrayList<>();
 
+    static final ArrayList<String> MODS = new ArrayList<>();
     static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
 
     @Override
@@ -61,6 +64,7 @@ public class Vanguard implements ModInitializer {
             String modId = mod.getMetadata().getId();
             CustomValue vanguardData = mod.getMetadata().getCustomValue("vanguard");
             if (vanguardData != null) {
+                MODS.add(modId);
                 CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
                 try {
                     URL rootUrl = mod.getRootPath().toUri().toURL();
@@ -117,6 +121,9 @@ public class Vanguard implements ModInitializer {
         }
     }
 
+    public static ArrayList<String> getMods() {
+        return MODS;
+    }
     public static ArrayList<String> getUpdatedMods() {
         return UPDATED_MODS;
     }
