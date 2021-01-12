@@ -5,6 +5,7 @@
   "client": [
     "TitleScreenMixin"
   ],
+  "plugin": "ladysnake.vanguard.VanguardMixinConfigPlugin",
   "injectors": {
     "defaultRequire": 1
   }
