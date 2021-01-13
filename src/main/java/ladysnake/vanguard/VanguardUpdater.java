@@ -6,6 +6,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.SemanticVersion;
+import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.Level;
 
@@ -110,42 +112,46 @@ public class VanguardUpdater {
             String latestVersion = latestVersionJson.get("version").getAsString();
             String latestFileName = latestVersionJson.get("filename").getAsString() + ".future";
             // if not the latest version, update toast
-            if (!latestVersion.equalsIgnoreCase(modVersion)) {
-                Vanguard.logger.log(Level.INFO, "Currently present version of " + modid + " is " + modVersion + " while the latest version is " + latestVersion + "; downloading update");
+            try {
+                if (SemanticVersion.parse(latestVersion).compareTo(SemanticVersion.parse(modVersion)) > 0) {
+                    Vanguard.logger.log(Level.INFO, "Currently present version of " + modid + " is " + modVersion + " while the latest version is " + latestVersion + "; downloading update");
 
-                try {
-                    // download new jar
-                    URL website = new URL(latestVersionJson.get("download").getAsString());
-                    ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-                    FileOutputStream fos = new FileOutputStream("mods/" + latestFileName);
-                    fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-                    Vanguard.logger.log(Level.INFO, latestFileName + " downloaded");
+                    try {
+                        // download new jar
+                        URL website = new URL(latestVersionJson.get("download").getAsString());
+                        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+                        FileOutputStream fos = new FileOutputStream("mods/" + latestFileName);
+                        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                        Vanguard.logger.log(Level.INFO, latestFileName + " downloaded");
 
-                    ModContainer mod = FabricLoader.getInstance().getModContainer(modid).get();
-                    URL rootUrl = mod.getRootPath().toUri().toURL();
-                    URLConnection connection = rootUrl.openConnection();
-                    if (connection instanceof JarURLConnection) {
-                        URI uri = ((JarURLConnection) connection).getJarFileURL().toURI();
-                        if (uri.getScheme().equals("file")) {
-                            // add the old jar to uninstaller params
-                            String oldFilePath = Paths.get(uri).toString();
-                            String oldFile = Paths.get(oldFilePath).getFileName().toString();
-                            Vanguard.UNINSTALLER_PARAMS.add(oldFile);
+                        ModContainer mod = FabricLoader.getInstance().getModContainer(modid).get();
+                        URL rootUrl = mod.getRootPath().toUri().toURL();
+                        URLConnection connection = rootUrl.openConnection();
+                        if (connection instanceof JarURLConnection) {
+                            URI uri = ((JarURLConnection) connection).getJarFileURL().toURI();
+                            if (uri.getScheme().equals("file")) {
+                                // add the old jar to uninstaller params
+                                String oldFilePath = Paths.get(uri).toString();
+                                String oldFile = Paths.get(oldFilePath).getFileName().toString();
+                                Vanguard.UNINSTALLER_PARAMS.add(oldFile);
 
-                            // add the new jar to uninstaller params
-                            Vanguard.UNINSTALLER_PARAMS.add(latestFileName);
+                                // add the new jar to uninstaller params
+                                Vanguard.UNINSTALLER_PARAMS.add(latestFileName);
 
-                            Vanguard.logger.log(Level.INFO, "Adding shutdown hook for uninstaller to update " + modid + ": " + oldFile + ", " + latestFileName);
-                            Vanguard.UPDATED_MODS.add(modid);
+                                Vanguard.logger.log(Level.INFO, "Adding shutdown hook for uninstaller to update " + modid + ": " + oldFile + ", " + latestFileName);
+                                Vanguard.UPDATED_MODS.add(modid);
+                            }
                         }
+                    } catch (MalformedURLException e) {
+                        Vanguard.logger.log(Level.ERROR, "Could not download update because of malformed URL: " + e.getMessage());
+                    } catch (IOException e) {
+                        Vanguard.logger.log(Level.ERROR, "Could not download update because of I/O Error: " + e.getMessage());
+                    } catch (URISyntaxException e) {
+                        Vanguard.logger.log(Level.ERROR, "Could not download update because of URI Syntax Error: " + e.getMessage());
                     }
-                } catch (MalformedURLException e) {
-                    Vanguard.logger.log(Level.ERROR, "Could not download update because of malformed URL: " + e.getMessage());
-                } catch (IOException e) {
-                    Vanguard.logger.log(Level.ERROR, "Could not download update because of I/O Error: " + e.getMessage());
-                } catch (URISyntaxException e) {
-                    Vanguard.logger.log(Level.ERROR, "Could not download update because of URI Syntax Error: " + e.getMessage());
                 }
+            } catch (VersionParsingException e) {
+                e.printStackTrace();
             }
         } else {
             Vanguard.logger.log(Level.WARN, "Update information could not be retrieved, auto-update will not be available");
