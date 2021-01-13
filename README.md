@@ -13,7 +13,7 @@ Additionally to being easy-to-use, by using Vanguard and not a custom updater yo
 include "io.github.ladysnake:vanguard:${vanguard_version}"
 ```
 
-You can find the current version of Satin in the [releases](https://github.com/Ladysnake/Vanguard/releases) tab of the repository on Github.
+You can find the current version of Vanguard in the [releases](https://github.com/Ladysnake/Vanguard/releases) tab of the repository on Github.
 
 ## Using Vanguard
 
