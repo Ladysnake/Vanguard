@@ -2,6 +2,10 @@
 
 **An easy-to-use auto-updater for Minecraft mods on the Fabric mod loader.**
 
+## Why Vanguard?
+
+Additionally to being easy-to-use, by using Vanguard and not a custom updater you will avoid chat message or toast notification spam. Vanguard uses a single main menu toast to indicate some mods are gonna be updated, and that's it. The user can also easily turn off Vanguard via its config, as well as check every mod that is using Vanguard (and the ones that are going to be updated next restart in yellow) in the config screen accessible via ModMenu on a client.
+
 ## Adding Vanguard to your buildscript:
 
 ```gradle
