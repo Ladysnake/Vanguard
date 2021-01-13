@@ -64,59 +64,38 @@ public class Vanguard implements ModInitializer {
             if (vanguardData != null) {
                 MODS.add(modId);
                 CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
-                try {
-                    URL rootUrl = mod.getRootPath().toUri().toURL();
-                    URLConnection connection = rootUrl.openConnection();
-                    if (connection instanceof JarURLConnection) {
-                        URI uri = ((JarURLConnection) connection).getJarFileURL().toURI();
-                        if (uri.getScheme().equals("file")) {
-                            String oldFilePath = Paths.get(uri).toString();
-                            String oldFile = Paths.get(oldFilePath).getFileName().toString();
-                            System.out.println(oldFile);
-                            UNINSTALLER_PARAMS.add(oldFile);
 
-                            if (vanguardObj.containsKey("update-url")) {
-                                VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString());
-                            } else if (vanguardObj.containsKey("curse-project-id")) {
-                                VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString());
-                            }
-                        } else {
-                            return; // else abort update
-                        }
-                    } else {
-                        return; // else abort update
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (vanguardObj.containsKey("update-url")) {
+                    VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString());
+                } else if (vanguardObj.containsKey("curse-project-id")) {
+                    VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString());
                 }
             }
         }
 
-        // extract the uninstaller if needed and add a shutdown hook to uninstall old files and install new ones
-        if (UNINSTALLER_PARAMS.size() > 0) {
-            InputStream in = Vanguard.class.getResourceAsStream("/" + Vanguard.UNINSTALLER);
+        // extract the uninstaller and add a shutdown hook to uninstall old files and install new ones
+        InputStream in = Vanguard.class.getResourceAsStream("/" + Vanguard.UNINSTALLER);
+        try {
+            Files.copy(in, Paths.get("mods/"+UNINSTALLER), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                Files.copy(in, Paths.get("mods/"+UNINSTALLER), StandardCopyOption.REPLACE_EXISTING);
+                Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, starting Vanguard uninstaller");
+
+                StringBuilder commandParams = new StringBuilder();
+                for (String uninstallerParam : UNINSTALLER_PARAMS) {
+                    commandParams.append(" ").append(uninstallerParam);
+                }
+
+                Runtime.getRuntime().exec("java -jar mods/" + Vanguard.UNINSTALLER + commandParams);
             } catch (IOException e) {
+                Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
                 e.printStackTrace();
             }
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, starting mod uninstaller");
-
-                    StringBuilder commandParams = new StringBuilder();
-                    for (String uninstallerParam : UNINSTALLER_PARAMS) {
-                        commandParams.append(" ").append(uninstallerParam);
-                    }
-
-                    Runtime.getRuntime().exec("java -jar mods/" + Vanguard.UNINSTALLER + commandParams);
-                } catch (IOException e) {
-                    Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
-                    e.printStackTrace();
-                }
-            }));
-        }
+        }));
     }
 
     public static ArrayList<String> getMods() {

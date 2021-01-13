@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.Level;
 
@@ -12,10 +13,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
@@ -45,7 +46,6 @@ public class VanguardUpdater {
                 return null;
             }).thenAcceptAsync(latestVersionJson -> {
                 downloadLatestVersion(latestVersionJson, modVersion, modid);
-                Vanguard.UPDATED_MODS.add(modid);
             }, MinecraftClient.getInstance());
         }
     }
@@ -101,7 +101,6 @@ public class VanguardUpdater {
                 return null;
             }).thenAcceptAsync(latestVersionJson -> {
                 downloadLatestVersion(latestVersionJson, modVersion, modid);
-                Vanguard.UPDATED_MODS.add(modid);
             }, MinecraftClient.getInstance());
         }
     }
@@ -120,14 +119,32 @@ public class VanguardUpdater {
                     ReadableByteChannel rbc = Channels.newChannel(website.openStream());
                     FileOutputStream fos = new FileOutputStream("mods/" + latestFileName);
                     fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                    Vanguard.logger.log(Level.INFO, latestFileName + " downloaded");
 
-                    // add the new jar to uninstaller params
-                    Vanguard.UNINSTALLER_PARAMS.add(latestFileName);
-                    Vanguard.UPDATED_MODS.add(modid);
+                    ModContainer mod = FabricLoader.getInstance().getModContainer(modid).get();
+                    URL rootUrl = mod.getRootPath().toUri().toURL();
+                    URLConnection connection = rootUrl.openConnection();
+                    if (connection instanceof JarURLConnection) {
+                        URI uri = ((JarURLConnection) connection).getJarFileURL().toURI();
+                        if (uri.getScheme().equals("file")) {
+                            // add the old jar to uninstaller params
+                            String oldFilePath = Paths.get(uri).toString();
+                            String oldFile = Paths.get(oldFilePath).getFileName().toString();
+                            Vanguard.UNINSTALLER_PARAMS.add(oldFile);
+
+                            // add the new jar to uninstaller params
+                            Vanguard.UNINSTALLER_PARAMS.add(latestFileName);
+
+                            Vanguard.logger.log(Level.INFO, "Adding shutdown hook for uninstaller to update " + modid + ": " + oldFile + ", " + latestFileName);
+                            Vanguard.UPDATED_MODS.add(modid);
+                        }
+                    }
                 } catch (MalformedURLException e) {
                     Vanguard.logger.log(Level.ERROR, "Could not download update because of malformed URL: " + e.getMessage());
                 } catch (IOException e) {
                     Vanguard.logger.log(Level.ERROR, "Could not download update because of I/O Error: " + e.getMessage());
+                } catch (URISyntaxException e) {
+                    Vanguard.logger.log(Level.ERROR, "Could not download update because of URI Syntax Error: " + e.getMessage());
                 }
             }
         } else {
