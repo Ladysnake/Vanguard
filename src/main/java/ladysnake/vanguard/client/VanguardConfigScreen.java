@@ -1,8 +1,8 @@
 package ladysnake.vanguard.client;
 
 import io.github.prospector.modmenu.gui.ModListWidget;
-import ladysnake.vanguard.Config;
-import ladysnake.vanguard.Vanguard;
+import ladysnake.vanguard.common.Config;
+import ladysnake.vanguard.common.Vanguard;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;

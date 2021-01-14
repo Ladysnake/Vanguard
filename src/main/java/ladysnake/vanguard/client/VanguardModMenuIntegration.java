@@ -1,8 +1,8 @@
 package ladysnake.vanguard.client;
 
 import io.github.prospector.modmenu.api.ModMenuApi;
-import ladysnake.vanguard.Config;
-import ladysnake.vanguard.Vanguard;
+import ladysnake.vanguard.common.Config;
+import ladysnake.vanguard.common.Vanguard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 

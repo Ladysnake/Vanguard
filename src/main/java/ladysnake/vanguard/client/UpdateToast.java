@@ -1,7 +1,7 @@
 package ladysnake.vanguard.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import ladysnake.vanguard.Vanguard;
+import ladysnake.vanguard.common.Vanguard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.toast.Toast;

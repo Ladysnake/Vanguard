@@ -1,4 +1,4 @@
-package ladysnake.vanguard;
+package ladysnake.vanguard.common;
 
 import net.fabricmc.loader.api.FabricLoader;
 

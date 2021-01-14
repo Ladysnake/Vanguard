@@ -1,4 +1,4 @@
-package ladysnake.vanguard;
+package ladysnake.vanguard.common;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.Level;
 
@@ -23,16 +24,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VanguardUpdater {
-    public static void addCustomUpdater(String modid, String updateUrl) {
+    public static void addCustomUpdater(String modid, String updateUrl, Executor executor) {
         // verify it's not a dev environment
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
             Vanguard.logger.info("Vanguard is looking for updates for " + modid);
 
-            String minecraftVersion = MinecraftClient.getInstance().getGame().getVersion().getName();
+            String minecraftVersion = SharedConstants.getGameVersion().getName();
             String modVersion = FabricLoader.getInstance().getModContainer(modid).get().getMetadata().getVersion().getFriendlyString();
             CompletableFuture.supplyAsync(() -> {
                 try (Reader reader = new InputStreamReader(new URL(updateUrl + minecraftVersion).openStream())) {
@@ -48,11 +50,11 @@ public class VanguardUpdater {
                 return null;
             }).thenAcceptAsync(latestVersionJson -> {
                 downloadLatestVersion(latestVersionJson, modVersion, modid);
-            }, MinecraftClient.getInstance());
+            }, executor);
         }
     }
 
-    public static void addCurseProxyUpdater(String modid, String cfProjectId) {
+    public static void addCurseProxyUpdater(String modid, String cfProjectId, Executor executor) {
         // verify it's not a dev environment
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
             Vanguard.logger.info("Vanguard is looking for updates for " + modid);
@@ -103,7 +105,7 @@ public class VanguardUpdater {
                 return null;
             }).thenAcceptAsync(latestVersionJson -> {
                 downloadLatestVersion(latestVersionJson, modVersion, modid);
-            }, MinecraftClient.getInstance());
+            }, executor);
         }
     }
 

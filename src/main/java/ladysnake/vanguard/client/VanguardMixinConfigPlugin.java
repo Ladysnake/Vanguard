@@ -1,4 +1,4 @@
-package ladysnake.vanguard;
+package ladysnake.vanguard.client;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;

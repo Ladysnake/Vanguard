@@ -1,4 +1,4 @@
-package ladysnake.vanguard;
+package ladysnake.vanguard.common;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,10 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Vanguard implements ModInitializer {
+public class Vanguard {
     public static final String MODID = "vanguard";
     static final Logger logger = LogManager.getLogger("Vanguard");
 
@@ -29,8 +30,7 @@ public class Vanguard implements ModInitializer {
     static final ArrayList<String> MODS = new ArrayList<>();
     static final ArrayList<String> UPDATED_MODS = new ArrayList<>();
 
-    @Override
-    public void onInitialize() {
+    public static void initialize(Executor executor) {
         // load config
         Config.load();
 
@@ -62,9 +62,9 @@ public class Vanguard implements ModInitializer {
                 CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
 
                 if (vanguardObj.containsKey("update-url")) {
-                    VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString());
+                    VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString(), executor);
                 } else if (vanguardObj.containsKey("curse-project-id")) {
-                    VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString());
+                    VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString(), executor);
                 }
             }
         }
