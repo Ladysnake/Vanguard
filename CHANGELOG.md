@@ -1,5 +1,8 @@
 # Vanguard - Changelog:
 
+### Vanguard 1.0.3
+- Fixed an issue with Vanguard crashing both dedicated servers and clients
+
 ### Vanguard 1.0.2
 - Fixed an issue with Vanguard crashing dedicated servers
 

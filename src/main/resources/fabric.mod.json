@@ -19,10 +19,10 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "ladysnake.vanguard.VanguardClient"
+      "ladysnake.vanguard.client.VanguardClient"
     ],
     "server": [
-      "ladysnake.vanguard.VanguardServer"
+      "ladysnake.vanguard.server.VanguardServer"
     ],
     "modmenu": [
       "ladysnake.vanguard.client.VanguardModMenuIntegration"
