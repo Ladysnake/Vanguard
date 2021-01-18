@@ -43,55 +43,57 @@ public class Vanguard {
             }
         }
 
-        // delete all .future files
-        Pattern pattern = Pattern.compile("\\.future$");
-        for (File mod : new File("mods").listFiles()) {
-            Matcher matcher = pattern.matcher(mod.getName());
-            if (matcher.find()) {
-                mod.delete();
-            }
-        }
-
-        // get all mods that must be watched by vanguard
-        FabricLoader loader = FabricLoader.getInstance();
-        for (ModContainer mod : loader.getAllMods()) {
-            String modId = mod.getMetadata().getId();
-            CustomValue vanguardData = mod.getMetadata().getCustomValue("vanguard");
-            if (vanguardData != null) {
-                MODS.add(modId);
-                CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
-
-                if (vanguardObj.containsKey("update-url")) {
-                    VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString(), executor);
-                } else if (vanguardObj.containsKey("curse-project-id")) {
-                    VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString(), executor);
+        if (Config.isToggled()) {
+            // delete all .future files
+            Pattern pattern = Pattern.compile("\\.future$");
+            for (File mod : new File("mods").listFiles()) {
+                Matcher matcher = pattern.matcher(mod.getName());
+                if (matcher.find()) {
+                    mod.delete();
                 }
             }
-        }
 
-        // extract the uninstaller and add a shutdown hook to uninstall old files and install new ones
-        InputStream in = Vanguard.class.getResourceAsStream("/" + Vanguard.UNINSTALLER);
-        try {
-            Files.copy(in, Paths.get("mods/"+UNINSTALLER), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            // get all mods that must be watched by vanguard
+            FabricLoader loader = FabricLoader.getInstance();
+            for (ModContainer mod : loader.getAllMods()) {
+                String modId = mod.getMetadata().getId();
+                CustomValue vanguardData = mod.getMetadata().getCustomValue("vanguard");
+                if (vanguardData != null) {
+                    MODS.add(modId);
+                    CustomValue.CvObject vanguardObj = vanguardData.getAsObject();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    if (vanguardObj.containsKey("update-url")) {
+                        VanguardUpdater.addCustomUpdater(modId, vanguardObj.get("update-url").getAsString(), executor);
+                    } else if (vanguardObj.containsKey("curse-project-id")) {
+                        VanguardUpdater.addCurseProxyUpdater(modId, vanguardObj.get("curse-project-id").getAsString(), executor);
+                    }
+                }
+            }
+
+            // extract the uninstaller and add a shutdown hook to uninstall old files and install new ones
+            InputStream in = Vanguard.class.getResourceAsStream("/" + Vanguard.UNINSTALLER);
             try {
-                Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, starting Vanguard uninstaller");
-
-                StringBuilder commandParams = new StringBuilder();
-                for (String uninstallerParam : UNINSTALLER_PARAMS) {
-                    commandParams.append(" ").append(uninstallerParam);
-                }
-
-                Runtime.getRuntime().exec("java -jar mods/" + Vanguard.UNINSTALLER + commandParams);
+                Files.copy(in, Paths.get("mods/" + UNINSTALLER), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
                 e.printStackTrace();
             }
-        }));
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    Vanguard.logger.log(Level.INFO, "Minecraft instance shutting down, starting Vanguard uninstaller");
+
+                    StringBuilder commandParams = new StringBuilder();
+                    for (String uninstallerParam : UNINSTALLER_PARAMS) {
+                        commandParams.append(" ").append(uninstallerParam);
+                    }
+
+                    Runtime.getRuntime().exec("java -jar mods/" + Vanguard.UNINSTALLER + commandParams);
+                } catch (IOException e) {
+                    Vanguard.logger.log(Level.ERROR, "Could not run uninstaller");
+                    e.printStackTrace();
+                }
+            }));
+        }
     }
 
     public static ArrayList<String> getMods() {
