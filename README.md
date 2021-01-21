@@ -10,6 +10,7 @@ Additionally to being easy-to-use, by using Vanguard and not a custom updater yo
 
 ```gradle
 repositories {
+	maven { url 'https://jitpack.io' }
 	// Ladysnake bintray
 	maven {
 		name = "Ladysnake Libs"
