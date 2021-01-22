@@ -9,7 +9,6 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.Level;
 
 import java.io.FileOutputStream;
@@ -59,7 +58,7 @@ public class VanguardUpdater {
         if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
             Vanguard.logger.info("Vanguard is looking for updates for " + modid);
 
-            String minecraftVersion = MinecraftClient.getInstance().getGame().getVersion().getName();
+            String minecraftVersion = SharedConstants.getGameVersion().getName();
             String modVersion = FabricLoader.getInstance().getModContainer(modid).get().getMetadata().getVersion().getFriendlyString();
             CompletableFuture.supplyAsync(() -> {
                 try (Reader reader = new InputStreamReader(new URL("https://curse.nikky.moe/api/addon/" + cfProjectId + "/files").openStream())) {

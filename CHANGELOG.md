@@ -1,5 +1,8 @@
 # Vanguard - Changelog:
 
+### Vanguard 1.0.5
+- Fixed an issue with Vanguard crashing dedicated servers, AGAIN
+
 ### Vanguard 1.0.4
 - Fixed an issue with the toggle config option not working
 
