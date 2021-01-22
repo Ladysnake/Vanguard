@@ -9,8 +9,21 @@ Additionally to being easy-to-use, by using Vanguard and not a custom updater yo
 ## Adding Vanguard to your buildscript:
 
 ```gradle
-// Includes Vanguard as a Jar-in-Jar dependency
-include "io.github.ladysnake:vanguard:${vanguard_version}"
+repositories {
+	maven { url 'https://jitpack.io' }
+	// Ladysnake bintray
+	maven {
+		name = "Ladysnake Libs"
+		url = "https://dl.bintray.com/ladysnake/libs"
+	}
+}
+```
+
+```gradle
+dependencies {
+	// Includes Vanguard as a Jar-in-Jar dependency
+	include "io.github.ladysnake:vanguard:${vanguard_version}"
+}
 ```
 
 You can find the current version of Vanguard in the [releases](https://github.com/Ladysnake/Vanguard/releases) tab of the repository on Github.
